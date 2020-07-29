@@ -54,7 +54,7 @@ class SlotableV2Test < ViewComponent::TestCase
   def test_invalid_slot_class_raises_error
     exception = assert_raises ArgumentError do
       render_inline(BadSlotV2Component.new) do |component|
-        component.title
+        component.title { "hello" }
       end
     end
 
