@@ -150,7 +150,7 @@ module ViewComponent
         end
 
         if block_given?
-          slot_instance.content = view_context.capture(&block) if block_given?
+          slot_instance.content = view_context.capture(&block)
         end
 
         if slot[:collection]
