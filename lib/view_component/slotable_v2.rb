@@ -34,6 +34,8 @@ module ViewComponent
         #     def initialize;end
         #   end
         #
+        # = Rendering slot content
+        #
         # The component's sidecar template can access the slot by calling a
         # helper method with the same name as the slot (pluralized if the slot
         # is a collection).
@@ -43,6 +45,8 @@ module ViewComponent
         #       <%= item.content %>
         #     <% end %>
         #   </h1>
+        #
+        # = Setting slot content
         #
         # Renderers of the component can set the content of a slot by calling a
         # helper method with the same name as the slot. For collection
