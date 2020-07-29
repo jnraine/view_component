@@ -108,8 +108,10 @@ class SlotableV2Test < ViewComponent::TestCase
   # the list of slots registered to a component
   # was accidentally assigned to all components!
   def test_slots_pollution
+    new_component_class = Class.new(ViewComponent::Base)
+    new_component_class.include(ViewComponent::Slotable)
     # this returned:
     # [SlotsV2Component::Subtitle, SlotsV2Component::Tab...]
-    assert_empty WrapperComponent.slots
+    assert_empty new_component_class.slots
   end
 end

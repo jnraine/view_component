@@ -166,9 +166,10 @@ module ViewComponent
         nil
       end
 
+      private
+
       def slot_class_for(slot_name)
         slot = self.class.registered_slots[slot_name]
-        slot_instance_variable_name = slot[:instance_variable_name]
 
         slot_class_name = slot[:class_name]
         slot_class = self.class.const_get(slot_class_name)
