@@ -104,6 +104,30 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_includes exception.message, ":content is a reserved slot name"
   end
 
+  def test_with_slot_with_content_arg
+    render_inline(SlotsV2Component.new(class_names: "mt-4")) do |component|
+      component.title(content: "This is my title!")
+      component.subtitle(content: "This is my subtitle!")
+
+      component.footer(content: "This is the footer", class_names: "text-blue")
+    end
+
+    assert_selector(".title", text: "This is my title!")
+    assert_selector(".subtitle", text: "This is my subtitle!")
+
+    assert_selector(".footer.text-blue", text: "This is the footer")
+  end
+
+  def test_with_slot_raises_with_both_content_arg_and_block
+    exception = assert_raises ArgumentError do
+      render_inline(SlotsV2Component.new(class_names: "mt-4")) do |component|
+        component.title(content: "This is my title!") { "This is my title!" }
+      end
+    end
+
+    assert_includes exception.message, "Slots can not be passed both a content argument and a block"
+  end
+
   # In a previous implementation of slots,
   # the list of slots registered to a component
   # was accidentally assigned to all components!
