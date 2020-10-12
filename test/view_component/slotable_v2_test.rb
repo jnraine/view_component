@@ -128,6 +128,18 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_includes exception.message, "Slots can not be passed both a content argument and a block"
   end
 
+  def test_with_slot_with_positional_args
+    # render_inline(SlotsV2WithPosArgComponent.new do |component|
+    #   component.item(class_names: "hello") { "My rad item" }
+    # end)
+    render_inline(SlotsV2WithPosArgComponent.new(class_names: "mt-4")) do |component|
+      component.item("my item", class_names: "hello") { "My rad item" }
+    end
+
+    assert_selector(".item", text: "my item")
+    assert_selector(".item-content", text: "My rad item")
+  end
+
   # In a previous implementation of slots,
   # the list of slots registered to a component
   # was accidentally assigned to all components!

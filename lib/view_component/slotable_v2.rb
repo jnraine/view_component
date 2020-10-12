@@ -79,11 +79,11 @@ module ViewComponent
           end
 
           # Defines the method to access slots and set slot values
-          define_method accessor_name do |**args, &block|
-            if args.empty? && block.nil?
+          define_method accessor_name do |*args, **kwargs, &block|
+            if args.empty? && kwargs.empty? && block.nil?
               get_slot(slot_name)
             else
-              set_slot(slot_name, **args, &block)
+              set_slot(slot_name, *args, **kwargs, &block)
             end
           end
 
@@ -91,8 +91,8 @@ module ViewComponent
           # e.g. `with_slot :tab` allows fetching all tabs with
           # `component.tabs` and setting a tab with `component.tab`
           if collection
-            define_method slot_name do |**args, &block|
-              set_slot(slot_name, **args, &block)
+            define_method slot_name do |*args, **kwargs, &block|
+              set_slot(slot_name, *args, **kwargs, &block)
             end
           end
 
@@ -134,24 +134,24 @@ module ViewComponent
         end
       end
 
-      def set_slot(slot_name, **args, &block)
+      def set_slot(slot_name, *args, **kwargs, &block)
         unless self.class.registered_slots.keys.include?(slot_name)
           raise ArgumentError.new "Unknown slot '#{slot_name}' - expected one of '#{self.class.registered_slots.keys}'"
         end
 
         content_arg = nil
 
-        if args.has_key?(:content)
-          content_arg = args[:content]
-          args.except!(:content)
+        if kwargs.has_key?(:content)
+          content_arg = kwargs[:content]
+          kwargs.except!(:content)
         end
 
         slot = self.class.registered_slots[slot_name]
         slot_instance_variable_name = slot[:instance_variable_name]
         slot_class = slot_class_for(slot_name)
 
-        slot_instance = if args.present?
-          slot_class.new(**args)
+        slot_instance = if args.present? ||kwargs.present?
+          slot_class.new(*args, **kwargs)
         else
           slot_class.new
         end
