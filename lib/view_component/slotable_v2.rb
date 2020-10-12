@@ -78,21 +78,38 @@ module ViewComponent
             slot_name
           end
 
-          # Defines the method to access slots and set slot values
-          define_method accessor_name do |*args, **kwargs, &block|
-            if args.empty? && kwargs.empty? && block.nil?
-              get_slot(slot_name)
-            else
+          if collection
+            # Define setter for singular names
+            # e.g. `with_slot :tab, collection: true` allows fetching all tabs with
+            # `component.tabs` and setting a tab with `component.tab`
+            define_method slot_name do |*args, **kwargs, &block|
+              # TODO raise here if attempting to get a collection slot using a singular method name?
+              # e.g. `component.item` with `with_slot :item, collection: true`
               set_slot(slot_name, *args, **kwargs, &block)
             end
-          end
 
-          # Define setter for singular names
-          # e.g. `with_slot :tab` allows fetching all tabs with
-          # `component.tabs` and setting a tab with `component.tab`
-          if collection
-            define_method slot_name do |*args, **kwargs, &block|
-              set_slot(slot_name, *args, **kwargs, &block)
+            # Instantiates and and adds multiple slots forwarding the first
+            # argument to each slot constructor
+            define_method accessor_name do |*args, **kwargs, &block|
+              if args.empty? && kwargs.empty? && block.nil?
+                get_slot(slot_name)
+              else
+                # Support instantiating collection slots with an enumerable
+                # object
+                slot_collection = args.shift
+                slot_collection.each do |collection_item|
+                  set_slot(slot_name, collection_item, *args, **kwargs, &block)
+                end
+              end
+            end
+          else
+            # non-collection methods
+            define_method accessor_name do |*args, **kwargs, &block|
+              if args.empty? && kwargs.empty? && block.nil?
+                get_slot(slot_name)
+              else
+                set_slot(slot_name, *args, **kwargs, &block)
+              end
             end
           end
 
