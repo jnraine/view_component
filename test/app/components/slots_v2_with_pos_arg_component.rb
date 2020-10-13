@@ -3,9 +3,7 @@
 class SlotsV2WithPosArgComponent < ViewComponent::Base
   include ViewComponent::Slotable::V2
 
-  with_slot :item, collection: true, class_name: "Item"
-
-  class Item < ViewComponent::Slot
+  with_slot :item, collection: true do
     attr_reader :title, :class_names
 
     def initialize(title, class_names:)

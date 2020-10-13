@@ -62,7 +62,7 @@ module ViewComponent
         #       <p>two</p>
         #     <% end %>
         #   <% end %>
-        def with_slot(slot_name, collection: false, class_name: nil)
+        def with_slot(slot_name, collection: false, &block)
           if self.registered_slots.key?(slot_name)
             raise ArgumentError.new("#{slot_name} slot declared multiple times")
           end
@@ -113,12 +113,12 @@ module ViewComponent
             end
           end
 
-          # Default class_name to ViewComponent::Slot
-          class_name = "ViewComponent::Slot" unless class_name.present?
+          slot_class = Class.new(ViewComponent::Slot)
+          slot_class.class_eval(&block) if block_given?
 
           # Register the slot on the component
           self.registered_slots[slot_name] = {
-            class_name: class_name,
+            klass: slot_class,
             instance_variable_name: :"@#{slot_name}",
             collection: collection
           }
@@ -165,7 +165,7 @@ module ViewComponent
 
         slot = self.class.registered_slots[slot_name]
         slot_instance_variable_name = slot[:instance_variable_name]
-        slot_class = slot_class_for(slot_name)
+        slot_class = slot[:klass]
 
         slot_instance = if args.present? ||kwargs.present?
           slot_class.new(*args, **kwargs)
@@ -197,21 +197,6 @@ module ViewComponent
         end
 
         nil
-      end
-
-      private
-
-      def slot_class_for(slot_name)
-        slot = self.class.registered_slots[slot_name]
-
-        slot_class_name = slot[:class_name]
-        slot_class = self.class.const_get(slot_class_name)
-
-        unless slot_class <= ViewComponent::Slot
-          raise ArgumentError.new "#{slot[:class_name]} must inherit from ViewComponent::Slot"
-        end
-
-        slot_class
       end
     end
   end
