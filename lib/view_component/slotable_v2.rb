@@ -164,13 +164,6 @@ module ViewComponent
           raise ArgumentError.new "Unknown slot '#{slot_name}' - expected one of '#{self.class.registered_slots.keys}'"
         end
 
-        content_arg = nil
-
-        if kwargs.has_key?(:content)
-          content_arg = kwargs[:content]
-          kwargs.except!(:content)
-        end
-
         slot = self.class.registered_slots[slot_name]
         slot_instance_variable_name = slot[:instance_variable_name]
         slot_class = slot[:klass]
@@ -181,17 +174,8 @@ module ViewComponent
           slot_class.new
         end
 
-        if block_given? && content_arg
-          raise ArgumentError.new "Slots can not be passed both a content argument and a block."
-        end
-
         if block_given?
           slot_instance.content = view_context.capture(&block)
-        end
-
-        # TODO ensure slots don't have content methods
-        if content_arg
-          slot_instance.content = content_arg
         end
 
         if slot[:collection]
