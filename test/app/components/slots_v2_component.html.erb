@@ -1,16 +1,16 @@
 <div class="card <%= @class_names %>">
   <div class="title">
-    <%= title.content %>
+    <%= title %>
   </div>
   <div class="subtitle">
-    <%= subtitle.content %>
+    <%= subtitle %>
   </div>
   <div class="nav">
     <%= tabs.inspect %>
     <% if tabs.any? %>
       <% tabs.each do |tab| %>
         <div class="tab">
-          <%= tab.content %>
+          <%= tab %>
         </div>
       <% end %>
     <% else %>
@@ -21,7 +21,7 @@
     <% if items.any? %>
       <% items.each do |item| %>
         <div class="item <%= item.class_names %>">
-          <%= item.content %>
+          <%= item %>
         </div>
       <% end %>
     <% else %>
@@ -29,6 +29,6 @@
     <% end %>
   </div>
   <div class="footer <%= footer.class_names %>">
-    <%= footer.content %>
+    <%= footer %>
   </div>
 </div>

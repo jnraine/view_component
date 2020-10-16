@@ -132,11 +132,6 @@ module ViewComponent
           if self.registered_slots.key?(slot_name)
             raise ArgumentError.new("#{slot_name} slot declared multiple times")
           end
-
-          # Ensure slot name is not :content
-          if slot_name == :content
-            raise ArgumentError.new ":content is a reserved slot name. Please use another name, such as ':body'"
-          end
         end
       end
 
@@ -175,7 +170,7 @@ module ViewComponent
         end
 
         if block_given?
-          slot_instance.content = view_context.capture(&block)
+          slot_instance._view_component_internal_content = view_context.capture(&block)
         end
 
         if slot[:collection]

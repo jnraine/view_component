@@ -86,14 +86,6 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_includes exception.message, "title slot declared multiple times"
   end
 
-  def test_with_slot_raise_with_content_keyword
-    exception = assert_raises ArgumentError do
-      SlotsV2Component.renders_one :content
-    end
-
-    assert_includes exception.message, ":content is a reserved slot name"
-  end
-
   def test_with_slot_with_positional_args
     render_inline(SlotsV2WithPosArgComponent.new(class_names: "mt-4")) do |component|
       component.item("my item", class_names: "hello") { "My rad item" }
