@@ -34,7 +34,6 @@ class SlotableV2Test < ViewComponent::TestCase
       end
     end
 
-
     assert_selector(".card.mt-4")
 
     assert_selector(".title", text: "This is my title!")
@@ -81,7 +80,6 @@ class SlotableV2Test < ViewComponent::TestCase
         "This is the footer"
       end
     end
-
 
     assert_selector(".card.mt-4")
 
