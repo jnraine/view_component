@@ -51,6 +51,54 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_selector(".footer.text-blue", text: "This is the footer")
   end
 
+  def test_renders_slots_in_inherited_components
+    render_inline(InheritedSlotsV2Component.new(class_names: "mt-4")) do |component|
+      component.title do
+        "This is my title!"
+      end
+      component.subtitle do
+        "This is my subtitle!"
+      end
+
+      component.tab do
+        "Tab A"
+      end
+      component.tab do
+        "Tab B"
+      end
+
+      component.item do
+        "Item A"
+      end
+      component.item(highlighted: true) do
+        "Item B"
+      end
+      component.item do
+        "Item C"
+      end
+
+      component.footer(class_names: "text-blue") do
+        "This is the footer"
+      end
+    end
+
+
+    assert_selector(".card.mt-4")
+
+    assert_selector(".title", text: "This is my title!")
+
+    assert_selector(".subtitle", text: "This is my subtitle!")
+
+    assert_selector(".tab", text: "Tab A")
+    assert_selector(".tab", text: "Tab B")
+
+    assert_selector(".item", count: 3)
+    assert_selector(".item.highlighted", count: 1)
+    assert_selector(".item.normal", count: 2)
+
+    assert_selector(".footer.text-blue", text: "This is the footer")
+  end
+
   def test_renders_slots_with_empty_collections
     render_inline(SlotsV2Component.new) do |component|
       component.title do
