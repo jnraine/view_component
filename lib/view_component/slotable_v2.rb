@@ -24,11 +24,8 @@ module ViewComponent
         #
         # = Example
         #
-        #   with_slot(
-        #     :item,
-        #     collection: true
-        #   ) do
-        #     def initialize(name:)
+        #   renders_one :header do
+        #     def initialize(classes:)
         #       @name = name
         #     end
         #   end
@@ -40,9 +37,7 @@ module ViewComponent
         # is a collection).
         #
         #   <h1>
-        #     <%= items.each do |item| %>
-        #       <%= item.content %>
-        #     <% end %>
+        #     <%= header %>
         #   </h1>
         #
         # = Setting slot content
@@ -53,12 +48,8 @@ module ViewComponent
         # slot.
         #
         #   <%= render_inline(MyComponent.new) do |component| %>
-        #     <%= component.item(name: "Foo") do %>
-        #       <p>One</p>
-        #     <% end %>
-        #
-        #     <%= component.item(name: "Bar") do %>
-        #       <p>two</p>
+        #     <%= component.header(classes: "Foo") do %>
+        #       <p>Bar</p>
         #     <% end %>
         #   <% end %>
         def renders_one(slot_name, &block)
@@ -75,6 +66,44 @@ module ViewComponent
           register_slot(slot_name, collection: false, &block)
         end
 
+        ##
+        # Registers a collection slot on the component.
+        #
+        # = Example
+        #
+        #   render_many :items do
+        #     def initialize(name:)
+        #       @name = name
+        #     end
+        #   end
+        #
+        # = Rendering slot content
+        #
+        # The component's sidecar template can access the slot by calling a
+        # helper method with the same name as the slot (pluralized if the slot
+        # is a collection).
+        #
+        #   <h1>
+        #     <%= items.each do |item| %>
+        #       <%= item %>
+        #     <% end %>
+        #   </h1>
+        #
+        # = Setting slot content
+        #
+        # Renderers of the component can set the content of a slot by calling a
+        # helper method with the same name as the slot. The method can be
+        # called multiple times to append to the slot.
+        #
+        #   <%= render_inline(MyComponent.new) do |component| %>
+        #     <%= component.item(name: "Foo") do %>
+        #       <p>One</p>
+        #     <% end %>
+        #
+        #     <%= component.item(name: "Bar") do %>
+        #       <p>two</p>
+        #     <% end %>
+        #   <% end %>
         def renders_many(slot_name, &block)
           validate_slot_name(slot_name)
 

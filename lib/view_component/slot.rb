@@ -2,6 +2,9 @@
 
 module ViewComponent
   class Slot
+    # Necessary for Slots v1
+    attr_accessor :content
+
     def _view_component_internal_content=(content)
       @_view_component_internal_content = content
     end
