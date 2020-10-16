@@ -26,12 +26,11 @@ module ViewComponent
         #
         #   with_slot(
         #     :item,
-        #     collection: true,
-        #     class_name: "Item" # class name string, used to instantiate Slot
-        #   )
-        #
-        #   class Item < ViewComponent::Slot
-        #     def initialize;end
+        #     collection: true
+        #   ) do
+        #     def initialize(name:)
+        #       @name = name
+        #     end
         #   end
         #
         # = Rendering slot content
@@ -54,65 +53,70 @@ module ViewComponent
         # slot.
         #
         #   <%= render_inline(MyComponent.new) do |component| %>
-        #     <%= component.item do %>
+        #     <%= component.item(name: "Foo") do %>
         #       <p>One</p>
         #     <% end %>
         #
-        #     <%= component.item do %>
+        #     <%= component.item(name: "Bar") do %>
         #       <p>two</p>
         #     <% end %>
         #   <% end %>
-        def with_slot(slot_name, collection: false, &block)
-          if self.registered_slots.key?(slot_name)
-            raise ArgumentError.new("#{slot_name} slot declared multiple times")
-          end
+        def renders_one(slot_name, &block)
+          validate_slot_name(slot_name)
 
-          # Ensure slot name is not :content
-          if slot_name == :content
-            raise ArgumentError.new ":content is a reserved slot name. Please use another name, such as ':body'"
-          end
-
-          accessor_name = if collection
-            ActiveSupport::Inflector.pluralize(slot_name)
-          else
-            slot_name
-          end
-
-          if collection
-            # Define setter for singular names
-            # e.g. `with_slot :tab, collection: true` allows fetching all tabs with
-            # `component.tabs` and setting a tab with `component.tab`
-            define_method slot_name do |*args, **kwargs, &block|
-              # TODO raise here if attempting to get a collection slot using a singular method name?
-              # e.g. `component.item` with `with_slot :item, collection: true`
+          define_method slot_name do |*args, **kwargs, &block|
+            if args.empty? && kwargs.empty? && block.nil?
+              get_slot(slot_name)
+            else
               set_slot(slot_name, *args, **kwargs, &block)
             end
+          end
 
-            # Instantiates and and adds multiple slots forwarding the first
-            # argument to each slot constructor
-            define_method accessor_name do |*args, **kwargs, &block|
-              if args.empty? && kwargs.empty? && block.nil?
-                get_slot(slot_name)
-              else
-                # Support instantiating collection slots with an enumerable
-                # object
-                slot_collection = args.shift
-                slot_collection.each do |collection_item|
-                  set_slot(slot_name, collection_item, *args, **kwargs, &block)
-                end
-              end
-            end
-          else
-            # non-collection methods
-            define_method accessor_name do |*args, **kwargs, &block|
-              if args.empty? && kwargs.empty? && block.nil?
-                get_slot(slot_name)
-              else
-                set_slot(slot_name, *args, **kwargs, &block)
+          register_slot(slot_name, collection: false, &block)
+        end
+
+        def renders_many(slot_name, &block)
+          validate_slot_name(slot_name)
+
+          singular_name = ActiveSupport::Inflector.singularize(slot_name)
+
+          # Define setter for singular names
+          # e.g. `with_slot :tab, collection: true` allows fetching all tabs with
+          # `component.tabs` and setting a tab with `component.tab`
+          define_method singular_name do |*args, **kwargs, &block|
+            # TODO raise here if attempting to get a collection slot using a singular method name?
+            # e.g. `component.item` with `with_slot :item, collection: true`
+            set_slot(slot_name, *args, **kwargs, &block)
+          end
+
+          # Instantiates and and adds multiple slots forwarding the first
+          # argument to each slot constructor
+          define_method slot_name do |*args, **kwargs, &block|
+            if args.empty? && kwargs.empty? && block.nil?
+              get_slot(slot_name)
+            else
+              # Support instantiating collection slots with an enumerable
+              # object
+              slot_collection = args.shift
+              slot_collection.each do |collection_item|
+                set_slot(slot_name, collection_item, *args, **kwargs, &block)
               end
             end
           end
 
+          register_slot(slot_name, collection: true, &block)
+        end
+
+        # Clone slot configuration into child class
+        # see #test_slots_pollution
+        def inherited(child)
+          child.registered_slots = self.registered_slots.clone
+          super
+        end
+
+        private
+
+        def register_slot(slot_name, collection:, &block)
           slot_class = Class.new(ViewComponent::Slot)
           slot_class.class_eval(&block) if block_given?
 
@@ -124,11 +128,15 @@ module ViewComponent
           }
         end
 
-        # Clone slot configuration into child class
-        # see #test_slots_pollution
-        def inherited(child)
-          child.registered_slots = self.registered_slots.clone
-          super
+        def validate_slot_name(slot_name)
+          if self.registered_slots.key?(slot_name)
+            raise ArgumentError.new("#{slot_name} slot declared multiple times")
+          end
+
+          # Ensure slot name is not :content
+          if slot_name == :content
+            raise ArgumentError.new ":content is a reserved slot name. Please use another name, such as ':body'"
+          end
         end
       end
 

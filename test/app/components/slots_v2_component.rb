@@ -3,9 +3,9 @@
 class SlotsV2Component < ViewComponent::Base
   include ViewComponent::Slotable::V2
 
-  with_slot :title
-  with_slot :subtitle
-  with_slot :footer do
+  renders_one :title
+  renders_one :subtitle
+  renders_one :footer do
     attr_reader :class_names
 
     def initialize(class_names: "")
@@ -13,9 +13,9 @@ class SlotsV2Component < ViewComponent::Base
     end
   end
 
-  with_slot :tab, collection: true
+  renders_many :tabs
 
-  with_slot :item, collection: true do
+  renders_many :items do
     def initialize(highlighted: false)
       @highlighted = highlighted
     end

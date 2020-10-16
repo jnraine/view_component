@@ -80,7 +80,7 @@ class SlotableV2Test < ViewComponent::TestCase
 
   def test_with_slot_raise_with_duplicate_slot_name
     exception = assert_raises ArgumentError do
-      SlotsV2Component.with_slot :title
+      SlotsV2Component.renders_one :title
     end
 
     assert_includes exception.message, "title slot declared multiple times"
@@ -88,7 +88,7 @@ class SlotableV2Test < ViewComponent::TestCase
 
   def test_with_slot_raise_with_content_keyword
     exception = assert_raises ArgumentError do
-      SlotsV2Component.with_slot :content
+      SlotsV2Component.renders_one :content
     end
 
     assert_includes exception.message, ":content is a reserved slot name"
