@@ -141,16 +141,6 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_selector(".item-content", text: "My rad item")
   end
 
-  def test_with_slot_with_collection
-    render_inline(SlotsV2WithPosArgComponent.new(class_names: "mt-4")) do |component|
-      component.items(["red", "yellow", "green"], class_names: "stop-light") { "my content" }
-    end
-
-    assert_selector(".item .stop-light", text: "red")
-    assert_selector(".item .stop-light", text: "yellow")
-    assert_selector(".item .stop-light", text: "green")
-  end
-
   # In a previous implementation of slots,
   # the list of slots registered to a component
   # was accidentally assigned to all components!

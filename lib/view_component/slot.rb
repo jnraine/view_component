@@ -2,15 +2,21 @@
 
 module ViewComponent
   class Slot
-    # Necessary for Slots v1
     attr_accessor :content
-
-    def _view_component_internal_content=(content)
-      @_view_component_internal_content = content
-    end
+    attr_writer :_component_instance
 
     def to_s
-      @_view_component_internal_content
+      content
+    end
+
+    def method_missing(symbol, *args, **kwargs, &block)
+      if defined?(@_component_instance)
+        @_component_instance.public_send(symbol, *args, **kwargs, &block)
+      elsif defined?(:"@#{symbol}")
+        instance_variable_get(:"@#{symbol}")
+      else
+        super
+      end
     end
   end
 end

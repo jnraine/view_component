@@ -52,7 +52,7 @@ module ViewComponent
         #       <p>Bar</p>
         #     <% end %>
         #   <% end %>
-        def renders_one(slot_name, &block)
+        def renders_one(slot_name, callable = nil)
           validate_slot_name(slot_name)
 
           define_method slot_name do |*args, **kwargs, &block|
@@ -63,7 +63,7 @@ module ViewComponent
             end
           end
 
-          register_slot(slot_name, collection: false, &block)
+          register_slot(slot_name, collection: false, callable: callable)
         end
 
         ##
@@ -104,7 +104,7 @@ module ViewComponent
         #       <p>two</p>
         #     <% end %>
         #   <% end %>
-        def renders_many(slot_name, &block)
+        def renders_many(slot_name, callable = nil)
           validate_slot_name(slot_name)
 
           singular_name = ActiveSupport::Inflector.singularize(slot_name)
@@ -133,7 +133,7 @@ module ViewComponent
             end
           end
 
-          register_slot(slot_name, collection: true, &block)
+          register_slot(slot_name, collection: true, callable: callable)
         end
 
         # Clone slot configuration into child class
@@ -145,7 +145,7 @@ module ViewComponent
 
         private
 
-        def register_slot(slot_name, collection:, &block)
+        def register_slot(slot_name, collection:, callable:)
           slot_class = Class.new(ViewComponent::Slot)
           slot_class.class_eval(&block) if block_given?
 
@@ -153,7 +153,8 @@ module ViewComponent
           self.registered_slots[slot_name] = {
             klass: slot_class,
             instance_variable_name: :"@#{slot_name}",
-            collection: collection
+            collection: collection,
+            callable: callable
           }
         end
 
@@ -192,14 +193,19 @@ module ViewComponent
         slot_instance_variable_name = slot[:instance_variable_name]
         slot_class = slot[:klass]
 
-        slot_instance = if args.present? ||kwargs.present?
-          slot_class.new(*args, **kwargs)
-        else
-          slot_class.new
-        end
+        slot_instance = slot_class.new
 
-        if block_given?
-          slot_instance._view_component_internal_content = view_context.capture(&block)
+        if slot[:callable]
+          result = slot_instance.instance_exec(*args, **kwargs, &slot[:callable])
+
+          if result.class < ViewComponent::Base
+            slot_instance._component_instance = result
+            slot_instance.content = view_context.capture { render(result, &block) }
+          elsif block_given?
+            slot_instance.content = view_context.capture(&block)
+          end
+        else
+          slot_instance.content = view_context.capture(&block)
         end
 
         if slot[:collection]
