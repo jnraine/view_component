@@ -146,17 +146,15 @@ module ViewComponent
       source_location = component_class.source_location
       return [] unless source_location
 
-      location_without_extension = source_location.chomp(File.extname(source_location))
-
       extensions = ActionView::Template.template_handler_extensions.join(",")
-
-      # view files in the same directory as the component
-      sidecar_files = Dir["#{location_without_extension}.*{#{extensions}}"]
 
       # view files in a directory named like the component
       directory = File.dirname(source_location)
       filename = File.basename(source_location, ".rb")
       component_name = component_class.name.demodulize.underscore
+
+      # view files in the same directory as the component
+      sidecar_files = Dir["#{directory}/#{component_name}.*{#{extensions}}"]
 
       sidecar_directory_files = Dir["#{directory}/#{component_name}/#{filename}.*{#{extensions}}"]
 
