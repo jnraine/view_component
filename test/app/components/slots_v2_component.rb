@@ -5,7 +5,11 @@ class SlotsV2Component < ViewComponent::Base
 
   renders_one :title
   renders_one :subtitle
-  renders_one :footer, -> (class_names: "") { @class_names = class_names }
+  renders_one :footer, -> (class_names: "") do
+    content_tag :footer, class: "footer text-blue" do
+      content
+    end
+  end
 
   renders_many :tabs
 
@@ -14,5 +18,4 @@ class SlotsV2Component < ViewComponent::Base
   def initialize(class_names: "")
     @class_names = class_names
   end
-
 end

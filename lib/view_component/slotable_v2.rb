@@ -191,21 +191,18 @@ module ViewComponent
 
         slot = self.class.registered_slots[slot_name]
         slot_instance_variable_name = slot[:instance_variable_name]
-        slot_class = slot[:klass]
 
-        slot_instance = slot_class.new
+        slot_instance = Slot.new(self)
+        slot_instance.content = view_context.capture(&block)
 
         if slot[:callable]
           result = slot_instance.instance_exec(*args, **kwargs, &slot[:callable])
 
           if result.class < ViewComponent::Base
             slot_instance._component_instance = result
-            slot_instance.content = view_context.capture { render(result, &block) }
-          elsif block_given?
-            slot_instance.content = view_context.capture(&block)
+          else
+            slot_instance.content = result
           end
-        else
-          slot_instance.content = view_context.capture(&block)
         end
 
         if slot[:collection]

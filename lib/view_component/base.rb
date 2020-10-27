@@ -125,7 +125,9 @@ module ViewComponent
 
     # For caching, such as #cache_if
     def format
-      @variant
+      if defined?(@variant)
+        @variant
+      end
     end
 
     # Assign the provided content to the content area accessor
@@ -280,7 +282,6 @@ module ViewComponent
       def provided_collection_parameter
         @provided_collection_parameter ||= nil
       end
-
     end
 
     ActiveSupport.run_load_hooks(:view_component, self)

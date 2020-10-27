@@ -2,20 +2,27 @@
 
 module ViewComponent
   class Slot
-    attr_accessor :content
+    attr_accessor :content, :parent
     attr_writer :_component_instance
 
+    # Parent must be `nil` for v1
+    def initialize(parent = nil)
+      @parent = parent
+    end
+
     def to_s
-      content
+      if defined?(@_component_instance)
+        parent.render(@_component_instance) { content }
+      else
+        content
+      end
     end
 
     def method_missing(symbol, *args, **kwargs, &block)
       if defined?(@_component_instance)
         @_component_instance.public_send(symbol, *args, **kwargs, &block)
-      elsif defined?(:"@#{symbol}")
-        instance_variable_get(:"@#{symbol}")
       else
-        super
+        parent.send(symbol, *args, **kwargs, &block)
       end
     end
   end
