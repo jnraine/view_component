@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MyHighlightComponent < ViewComponent::Base
   def initialize(highlighted: false)
     @highlighted = highlighted
