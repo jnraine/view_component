@@ -159,9 +159,11 @@ module ViewComponent
       end
 
       def get_slot(slot_name)
+        # :nocov:
         unless self.class.registered_slots.keys.include?(slot_name)
           raise ArgumentError.new "Unknown slot '#{slot_name}' - expected one of '#{self.class.registered_slots.keys}'"
         end
+        # :nocov:
 
         slot = self.class.registered_slots[slot_name]
         slot_instance_variable_name = slot[:instance_variable_name]
@@ -178,9 +180,11 @@ module ViewComponent
       end
 
       def set_slot(slot_name, *args, **kwargs, &block)
+        # :nocov:
         unless self.class.registered_slots.keys.include?(slot_name)
           raise ArgumentError.new "Unknown slot '#{slot_name}' - expected one of '#{self.class.registered_slots.keys}'"
         end
+        # :nocov:
 
         slot = self.class.registered_slots[slot_name]
         slot_instance_variable_name = slot[:instance_variable_name]
