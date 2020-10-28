@@ -122,13 +122,6 @@ module ViewComponent
           define_method slot_name do |*args, **kwargs, &block|
             if args.empty? && kwargs.empty? && block.nil?
               get_slot(slot_name)
-            else
-              # Support instantiating collection slots with an enumerable
-              # object
-              slot_collection = args.shift
-              slot_collection.each do |collection_item|
-                set_slot(slot_name, collection_item, *args, **kwargs, &block)
-              end
             end
           end
 
