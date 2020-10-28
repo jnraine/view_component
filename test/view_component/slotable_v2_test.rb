@@ -141,6 +141,24 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_selector(".item-content", text: "My rad item")
   end
 
+  def test_slot_with_component_delegate
+    render_inline SlotsV2DelegateComponent.new do |component|
+      component.item do
+        "Item A"
+      end
+      component.item(highlighted: true) do
+        "Item B"
+      end
+      component.item do
+        "Item C"
+      end
+    end
+
+    assert_selector(".item", count: 3)
+    assert_selector(".item.highlighted", count: 1)
+    assert_selector(".item.normal", count: 2)
+  end
+
   # In a previous implementation of slots,
   # the list of slots registered to a component
   # was accidentally assigned to all components!

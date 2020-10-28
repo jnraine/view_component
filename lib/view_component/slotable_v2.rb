@@ -160,6 +160,7 @@ module ViewComponent
 
         def validate_slot_name(slot_name)
           if self.registered_slots.key?(slot_name)
+            # TODO remove? This breaks overriding slots when slots are inherited
             raise ArgumentError.new("#{slot_name} slot declared multiple times")
           end
         end
@@ -195,7 +196,10 @@ module ViewComponent
         slot_instance = Slot.new(self)
         slot_instance.content = view_context.capture(&block)
 
-        if slot[:callable]
+        if slot[:callable].is_a?(Class) && slot[:callable] < ViewComponent::Base
+          result = slot[:callable].new(*args, **kwargs)
+          slot_instance._component_instance = result
+        elsif slot[:callable]
           result = slot_instance.instance_exec(*args, **kwargs, &slot[:callable])
 
           if result.class < ViewComponent::Base
