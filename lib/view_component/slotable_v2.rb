@@ -80,8 +80,7 @@ module ViewComponent
         # = Rendering slot content
         #
         # The component's sidecar template can access the slot by calling a
-        # helper method with the same name as the slot (pluralized if the slot
-        # is a collection).
+        # helper method with the same name as the slot.
         #
         #   <h1>
         #     <%= items.each do |item| %>
