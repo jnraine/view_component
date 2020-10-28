@@ -18,11 +18,11 @@ module ViewComponent
       end
     end
 
-    def method_missing(symbol, *args, **kwargs, &block)
+    def method_missing(symbol, *args, &block)
       if defined?(@_component_instance)
-        @_component_instance.public_send(symbol, *args, **kwargs, &block)
+        @_component_instance.public_send(symbol, *args, &block)
       else
-        parent.send(symbol, *args, **kwargs, &block)
+        parent.send(symbol, *args, &block)
       end
     end
   end

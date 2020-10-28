@@ -13,7 +13,9 @@ class SlotsV2Component < ViewComponent::Base
 
   renders_many :tabs
 
-  renders_many :items, -> (highlighted: false) { MyHighlightComponent.new(highlighted: highlighted) }
+  renders_many :items, -> (highlighted: false) do
+    MyHighlightComponent.new(highlighted: highlighted)
+  end
 
   def initialize(class_names: "")
     @class_names = class_names
