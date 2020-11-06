@@ -1,0 +1,9 @@
+<header class="<%= header.classes %>">
+  <%= header.content %>
+</header>
+
+<%= items.each do |item| %>
+  <div class="<%= item.classes %>">
+    <%= item.content %>
+  </div>
+<% end %>
