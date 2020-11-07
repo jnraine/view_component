@@ -20,8 +20,6 @@ module ViewComponent
         @_content
       elsif defined?(@_content_block)
         @_content_block.call
-      else
-        ""
       end
     end
 

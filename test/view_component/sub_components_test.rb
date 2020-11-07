@@ -125,7 +125,7 @@ class SubComponentsTest < ViewComponent::TestCase
     end
   end
 
-  def test_with_slot_raise_with_duplicate_slot_name
+  def test_sub_component_raise_with_duplicate_slot_name
     exception = assert_raises ArgumentError do
       SubComponentComponent.renders_one :title
     end
@@ -133,7 +133,7 @@ class SubComponentsTest < ViewComponent::TestCase
     assert_includes exception.message, "title slot declared multiple times"
   end
 
-  def test_with_slot_with_positional_args
+  def test_sub_component_with_positional_args
     render_inline(SubComponentWithPosArgComponent.new(class_names: "mt-4")) do |component|
       component.item("my item", class_names: "hello") { "My rad item" }
     end

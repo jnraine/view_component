@@ -139,7 +139,6 @@ module ViewComponent
         slot = {
           collection: collection,
         }
-
         # If callable responds to `render_in`, we set it on the slot as a renderable
         if callable && callable.respond_to?(:method_defined?) && callable.method_defined?(:render_in)
           slot[:renderable] = callable
@@ -189,8 +188,8 @@ module ViewComponent
 
       if slot[:renderable]
         slot_instance._component_instance = slot[:renderable].new(*args, **kwargs)
-      elsif slot[:renderable_class]
-        slot_instance._component_instance = const_get(slot[:renderable_class]).new(*args, **kwargs)
+      elsif slot[:renderable_class_name]
+        slot_instance._component_instance = self.class.const_get(slot[:renderable_class_name]).new(*args, **kwargs)
       elsif slot[:renderable_function]
         renderable_value = slot[:renderable_function].bind(self).call(*args, **kwargs, &block)
 
