@@ -85,7 +85,7 @@ module ViewComponent
       #
       #   render_many :items, -> (name:) { ItemComponent.new(name: name }
       #
-      #   # OR 
+      #   # OR
       #
       #   render_many :items, ItemComponent
       #
