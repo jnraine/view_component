@@ -153,12 +153,19 @@ module ViewComponent
       filename = File.basename(source_location, ".rb")
       component_name = component_class.name.demodulize.underscore
 
+      sub_component_files = if component_class.name.include?("::")
+        subcomponent_path = component_class.name.split("::")[0...-1].map(&:underscore).join("/")
+        Dir["#{directory}/#{subcomponent_path}/#{component_name}.*{#{extensions}}"]
+      else
+        []
+      end
+
       # view files in the same directory as the component
       sidecar_files = Dir["#{directory}/#{component_name}.*{#{extensions}}"]
 
       sidecar_directory_files = Dir["#{directory}/#{component_name}/#{filename}.*{#{extensions}}"]
 
-      (sidecar_files - [source_location] + sidecar_directory_files)
+      (sidecar_files - [source_location] + sidecar_directory_files + sub_component_files)
     end
 
     def inline_calls
