@@ -29,13 +29,29 @@ module ViewComponent
       #
       #   renders_on :header, HeaderComponent
       #
+      #   where `HeaderComponent` is defined as:
+      #
+      #   class HeaderComponent < ViewComponent::Base
+      #     def initialize(classes:)
+      #       @classes = classes
+      #     end
+      #   end
+      #
+      #   and has the following template:
+      #
+      #   <header class="<%= @classes %>">
+      #     <%= content %>
+      #   </header>
+      #
       # = Rendering sub-component content
       #
       # The component's sidecar template can access the sub-component by calling a
       # helper method with the same name as the sub-component.
       #
       #   <h1>
-      #     <%= header %>
+      #     <%= header do %>
+      #       My header title
+      #     <% end %>
       #   </h1>
       #
       # = Setting sub-component content
