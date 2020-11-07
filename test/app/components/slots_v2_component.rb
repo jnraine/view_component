@@ -5,9 +5,9 @@ class SlotsV2Component < ViewComponent::Base
 
   renders_one :title
   renders_one :subtitle
-  renders_one :footer, -> (class_names: "") do
-    content_tag :footer, class: "footer text-blue" do
-      content
+  renders_one :footer, -> (class_names: "", &block) do
+    content_tag :footer, class: "footer #{class_names}" do
+      block.call if block
     end
   end
 

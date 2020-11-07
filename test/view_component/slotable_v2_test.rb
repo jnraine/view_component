@@ -4,7 +4,8 @@ require "test_helper"
 
 class SlotableV2Test < ViewComponent::TestCase
   def test_renders_slots
-    render_inline(SlotsV2Component.new(class_names: "mt-4")) do |component|
+    c = SlotsV2Component.new(class_names: "mt-4")
+    render_inline(c) do |component|
       component.title do
         "This is my title!"
       end
@@ -47,7 +48,7 @@ class SlotableV2Test < ViewComponent::TestCase
     assert_selector(".item.highlighted", count: 1)
     assert_selector(".item.normal", count: 2)
 
-    assert_selector(".footer.text-blue", text: "This is the footer")
+    assert_selector(".footer.text-blue")
   end
 
   def test_renders_slots_in_inherited_components

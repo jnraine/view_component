@@ -138,15 +138,27 @@ module ViewComponent
         private
 
         def register_slot(slot_name, collection:, callable:)
-          slot_class = Class.new(ViewComponent::Slot)
-          slot_class.class_eval(&block) if block_given?
+          # Setup basic slot data
+          slot = {
+            collection: collection,
+          }
+
+          # If callable responds to `render_in`, we set it on the slot as a renderable
+          if callable && callable.respond_to?(:method_defined?) && callable.method_defined?(:render_in)
+            slot[:renderable] = callable
+          elsif callable.is_a?(String)
+            # If callable is a string, we assume it's referencing an internal class
+            slot[:renderable_class_name] = callable
+          elsif callable
+            # If slot does not respond to `render_in`, we assume it's a proc,
+            # define a method, and save a reference to it to call when setting
+            method_name = :"_call_#{slot_name}"
+            define_method method_name, &callable
+            slot[:renderable_function] = instance_method(method_name)
+          end
 
           # Register the slot on the component
-          self.registered_slots[slot_name] = {
-            klass: slot_class,
-            collection: collection,
-            callable: callable
-          }
+          self.registered_slots[slot_name] = slot
         end
 
         def validate_slot_name(slot_name)
@@ -178,15 +190,18 @@ module ViewComponent
         slot_instance = Slot.new(self)
         slot_instance._content_block = block if block_given?
 
-        if slot[:callable].is_a?(Class) && slot[:callable] < ViewComponent::Base
-          slot_instance._component_instance = slot[:callable].new(*args, **kwargs)
-        elsif slot[:callable]
-          result = instance_exec(*args, **kwargs, &slot[:callable])
+        if slot[:renderable]
+          slot_instance._component_instance = slot[:renderable].new(*args, **kwargs)
+        elsif slot[:renderable_class]
+          slot_instance._component_instance = const_get(slot[:renderable_class]).new(*args, **kwargs)
+        elsif slot[:renderable_function]
+          renderable_value = slot[:renderable_function].bind(self).call(*args, **kwargs, &block)
 
-          if result.class < ViewComponent::Base
-            slot_instance._component_instance = result
+          # Function calls can return components, so if it's a component handle it specially
+          if renderable_value.respond_to?(:render_in)
+            slot_instance._component_instance = renderable_value
           else
-            slot_instance._content_block = -> { result }
+            slot_instance.content = renderable_value
           end
         end
 

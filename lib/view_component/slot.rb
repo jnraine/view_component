@@ -15,9 +15,14 @@ module ViewComponent
         # render_in is faster than `parent.render`
         @_component_instance.render_in(
           parent.send(:view_context),
+          &@_content_block
         )
-      else
+      elsif defined?(@content)
+        @content
+      elsif defined?(@_content_block)
         @_content_block.call
+      else
+        ""
       end
     end
 
