@@ -144,7 +144,6 @@ module ViewComponent
           # Register the slot on the component
           self.registered_slots[slot_name] = {
             klass: slot_class,
-            instance_variable_name: :"@#{slot_name}",
             collection: collection,
             callable: callable
           }
@@ -159,17 +158,11 @@ module ViewComponent
       end
 
       def get_slot(slot_name)
-        # :nocov:
-        unless self.class.registered_slots.keys.include?(slot_name)
-          raise ArgumentError.new "Unknown slot '#{slot_name}' - expected one of '#{self.class.registered_slots.keys}'"
-        end
-        # :nocov:
-
         slot = self.class.registered_slots[slot_name]
-        slot_instance_variable_name = slot[:instance_variable_name]
+        @_set_slots ||= {}
 
-        if instance_variable_defined?(slot_instance_variable_name)
-          return instance_variable_get(slot_instance_variable_name)
+        if @_set_slots[slot_name]
+          return @_set_slots[slot_name]
         end
 
         if slot[:collection]
@@ -180,39 +173,32 @@ module ViewComponent
       end
 
       def set_slot(slot_name, *args, **kwargs, &block)
-        # :nocov:
-        unless self.class.registered_slots.keys.include?(slot_name)
-          raise ArgumentError.new "Unknown slot '#{slot_name}' - expected one of '#{self.class.registered_slots.keys}'"
-        end
-        # :nocov:
-
         slot = self.class.registered_slots[slot_name]
-        slot_instance_variable_name = slot[:instance_variable_name]
 
         slot_instance = Slot.new(self)
-        slot_instance.content = view_context.capture(&block)
+        slot_instance._content_block = block if block_given?
 
         if slot[:callable].is_a?(Class) && slot[:callable] < ViewComponent::Base
-          result = slot[:callable].new(*args, **kwargs)
-          slot_instance._component_instance = result
+          slot_instance._component_instance = slot[:callable].new(*args, **kwargs)
+          slot_instance._component_instance.content = slot_instance.content
         elsif slot[:callable]
-          result = slot_instance.instance_exec(*args, **kwargs, &slot[:callable])
+          result = instance_exec(*args, **kwargs, &slot[:callable])
 
           if result.class < ViewComponent::Base
             slot_instance._component_instance = result
+            slot_instance._component_instance.content = slot_instance.content
           else
             slot_instance.content = result
           end
         end
 
-        if slot[:collection]
-          if !instance_variable_defined?(slot_instance_variable_name)
-            instance_variable_set(slot_instance_variable_name, [])
-          end
+        @_set_slots ||= {}
 
-          instance_variable_get(slot_instance_variable_name) << slot_instance
+        if slot[:collection]
+          @_set_slots[slot_name] ||= []
+          @_set_slots[slot_name].push(slot_instance)
         else
-          instance_variable_set(slot_instance_variable_name, slot_instance)
+          @_set_slots[slot_name] = slot_instance
         end
 
         nil
