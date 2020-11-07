@@ -180,15 +180,13 @@ module ViewComponent
 
         if slot[:callable].is_a?(Class) && slot[:callable] < ViewComponent::Base
           slot_instance._component_instance = slot[:callable].new(*args, **kwargs)
-          slot_instance._component_instance.content = slot_instance.content
         elsif slot[:callable]
           result = instance_exec(*args, **kwargs, &slot[:callable])
 
           if result.class < ViewComponent::Base
             slot_instance._component_instance = result
-            slot_instance._component_instance.content = slot_instance.content
           else
-            slot_instance.content = result
+            slot_instance._content_block = -> { result }
           end
         end
 

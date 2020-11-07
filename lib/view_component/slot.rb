@@ -2,9 +2,8 @@
 
 module ViewComponent
   class Slot
-    attr_accessor :content, :parent, :content_block
+    attr_accessor :parent, :content
     attr_accessor :_component_instance, :_content_block
-
 
     # Parent must be `nil` for v1
     def initialize(parent = nil)
@@ -18,7 +17,7 @@ module ViewComponent
           parent.send(:view_context),
         )
       else
-        content
+        @_content_block.call
       end
     end
 
