@@ -184,7 +184,7 @@ module ViewComponent
     def set_slot(slot_name, *args, **kwargs, &block)
       slot = self.class.registered_slots[slot_name]
 
-      slot_instance = Slot.new(self)
+      slot_instance = SubComponentWrapper.new(self)
       slot_instance._content_block = block if block_given?
 
       if slot[:renderable]
@@ -198,7 +198,7 @@ module ViewComponent
         if renderable_value.respond_to?(:render_in)
           slot_instance._component_instance = renderable_value
         else
-          slot_instance.content = renderable_value
+          slot_instance._content = renderable_value
         end
       end
 
