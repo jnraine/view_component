@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class SlotsV2WithPosArgComponent < ViewComponent::Base
-  include ViewComponent::Slotable::V2
+class SubComponentWithPosArgComponent < ViewComponent::Base
+  include ViewComponent::SubComponents
 
   renders_many :items, ->(title, class_names) do
     Item.new(title: title, class_names: class_names)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class SlotsV2DelegateComponent < ViewComponent::Base
-  include ViewComponent::Slotable::V2
+class SubComponentDelegateComponent < ViewComponent::Base
+  include ViewComponent::SubComponents
 
   renders_many :items, MyHighlightComponent
 

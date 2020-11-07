@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class SlotsV2Component < ViewComponent::Base
-  include ViewComponent::Slotable::V2
+class SubComponentComponent < ViewComponent::Base
+  include ViewComponent::SubComponents
 
   renders_one :title
   renders_one :subtitle

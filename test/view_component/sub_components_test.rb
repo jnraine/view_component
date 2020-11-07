@@ -2,9 +2,9 @@
 
 require "test_helper"
 
-class SlotableV2Test < ViewComponent::TestCase
+class SubComponentsTest < ViewComponent::TestCase
   def test_renders_slots
-    c = SlotsV2Component.new(class_names: "mt-4")
+    c = SubComponentComponent.new(class_names: "mt-4")
     render_inline(c) do |component|
       component.title do
         "This is my title!"
@@ -52,7 +52,7 @@ class SlotableV2Test < ViewComponent::TestCase
   end
 
   def test_renders_slots_in_inherited_components
-    render_inline(InheritedSlotsV2Component.new(class_names: "mt-4")) do |component|
+    render_inline(InheritedSubComponentComponent.new(class_names: "mt-4")) do |component|
       component.title do
         "This is my title!"
       end
@@ -99,7 +99,7 @@ class SlotableV2Test < ViewComponent::TestCase
   end
 
   def test_renders_slots_with_empty_collections
-    render_inline(SlotsV2Component.new) do |component|
+    render_inline(SubComponentComponent.new) do |component|
       component.title do
         "This is my title!"
       end
@@ -119,7 +119,7 @@ class SlotableV2Test < ViewComponent::TestCase
 
   def test_renders_slots_template_raise_with_unknown_content_areas
     assert_raises NoMethodError do
-      render_inline(SlotsV2Component.new) do |component|
+      render_inline(SubComponentComponent.new) do |component|
         component.foo { "Hello!" }
       end
     end
@@ -127,14 +127,14 @@ class SlotableV2Test < ViewComponent::TestCase
 
   def test_with_slot_raise_with_duplicate_slot_name
     exception = assert_raises ArgumentError do
-      SlotsV2Component.renders_one :title
+      SubComponentComponent.renders_one :title
     end
 
     assert_includes exception.message, "title slot declared multiple times"
   end
 
   def test_with_slot_with_positional_args
-    render_inline(SlotsV2WithPosArgComponent.new(class_names: "mt-4")) do |component|
+    render_inline(SubComponentWithPosArgComponent.new(class_names: "mt-4")) do |component|
       component.item("my item", class_names: "hello") { "My rad item" }
     end
 
@@ -143,7 +143,7 @@ class SlotableV2Test < ViewComponent::TestCase
   end
 
   def test_slot_with_component_delegate
-    render_inline SlotsV2DelegateComponent.new do |component|
+    render_inline SubComponentDelegateComponent.new do |component|
       component.item do
         "Item A"
       end
@@ -167,7 +167,7 @@ class SlotableV2Test < ViewComponent::TestCase
     new_component_class = Class.new(ViewComponent::Base)
     new_component_class.include(ViewComponent::Slotable)
     # this returned:
-    # [SlotsV2Component::Subtitle, SlotsV2Component::Tab...]
+    # [SubComponentComponent::Subtitle, SubComponentComponent::Tab...]
     assert_empty new_component_class.slots
   end
 end

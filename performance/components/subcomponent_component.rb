@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SubcomponentComponent < ViewComponent::Base
-  include ViewComponent::Slotable::V2
+  include ViewComponent::SubComponents
 
   renders_one :header, -> (**kwargs) { HeaderComponent.new(**kwargs) }
   renders_many :items, -> (**kwargs) { ItemComponent.new(**kwargs) }
