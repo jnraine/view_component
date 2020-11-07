@@ -4,7 +4,7 @@ require "test_helper"
 
 class SubComponentsTest < ViewComponent::TestCase
   def test_renders_slots
-    c = SubComponentComponent.new(class_names: "mt-4")
+    c = SubComponentComponent.new(classes: "mt-4")
     render_inline(c) do |component|
       component.title do
         "This is my title!"
@@ -30,7 +30,7 @@ class SubComponentsTest < ViewComponent::TestCase
         "Item C"
       end
 
-      component.footer(class_names: "text-blue") do
+      component.footer(classes: "text-blue") do
         "This is the footer"
       end
     end
@@ -52,7 +52,7 @@ class SubComponentsTest < ViewComponent::TestCase
   end
 
   def test_renders_slots_in_inherited_components
-    render_inline(InheritedSubComponentComponent.new(class_names: "mt-4")) do |component|
+    render_inline(InheritedSubComponentComponent.new(classes: "mt-4")) do |component|
       component.title do
         "This is my title!"
       end
@@ -77,7 +77,7 @@ class SubComponentsTest < ViewComponent::TestCase
         "Item C"
       end
 
-      component.footer(class_names: "text-blue") do
+      component.footer(classes: "text-blue") do
         "This is the footer"
       end
     end
@@ -134,8 +134,8 @@ class SubComponentsTest < ViewComponent::TestCase
   end
 
   def test_sub_component_with_positional_args
-    render_inline(SubComponentWithPosArgComponent.new(class_names: "mt-4")) do |component|
-      component.item("my item", class_names: "hello") { "My rad item" }
+    render_inline(SubComponentWithPosArgComponent.new(classes: "mt-4")) do |component|
+      component.item("my item", classes: "hello") { "My rad item" }
     end
 
     assert_selector(".item", text: "my item")
@@ -163,11 +163,11 @@ class SubComponentsTest < ViewComponent::TestCase
   # In a previous implementation of slots,
   # the list of slots registered to a component
   # was accidentally assigned to all components!
-  def test_slots_pollution
+  def test_sub_components_pollution
     new_component_class = Class.new(ViewComponent::Base)
-    new_component_class.include(ViewComponent::Slotable)
+    new_component_class.include(ViewComponent::SubComponents)
     # this returned:
     # [SubComponentComponent::Subtitle, SubComponentComponent::Tab...]
-    assert_empty new_component_class.slots
+    assert_empty new_component_class.registered_sub_components
   end
 end

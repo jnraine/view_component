@@ -9,7 +9,7 @@ class MyHighlightComponent < ViewComponent::Base
     content
   end
 
-  def class_names
+  def classes
     @highlighted ? "highlighted" : "normal"
   end
 end

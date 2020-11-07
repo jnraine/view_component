@@ -5,8 +5,8 @@ class SubComponentComponent < ViewComponent::Base
 
   renders_one :title
   renders_one :subtitle
-  renders_one :footer, -> (class_names: "", &block) do
-    content_tag :footer, class: "footer #{class_names}" do
+  renders_one :footer, -> (classes: "", &block) do
+    content_tag :footer, class: "footer #{classes}" do
       block.call if block
     end
   end
@@ -17,7 +17,7 @@ class SubComponentComponent < ViewComponent::Base
     MyHighlightComponent.new(highlighted: highlighted)
   end
 
-  def initialize(class_names: "")
-    @class_names = class_names
+  def initialize(classes: "")
+    @classes = classes
   end
 end

@@ -126,6 +126,7 @@ module ViewComponent
 
     # For caching, such as #cache_if
     def format
+      # Ruby 2.6 throws a warning without this
       if defined?(@variant)
         @variant
       end

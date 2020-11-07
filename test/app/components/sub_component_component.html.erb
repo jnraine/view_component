@@ -1,4 +1,4 @@
-<div class="card <%= @class_names %>">
+<div class="card <%= @classes %>">
   <div class="title">
     <%= title %>
   </div>
@@ -6,7 +6,6 @@
     <%= subtitle %>
   </div>
   <div class="nav">
-    <%= tabs.inspect %>
     <% if tabs.any? %>
       <% tabs.each do |tab| %>
         <div class="tab">
@@ -20,7 +19,7 @@
   <div class="body">
     <% if items.any? %>
       <% items.each do |item| %>
-        <div class="item <%= item.class_names %>">
+        <div class="item <%= item.classes %>">
           <%= item %>
         </div>
       <% end %>

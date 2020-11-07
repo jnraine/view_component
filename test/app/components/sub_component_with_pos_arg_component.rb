@@ -6,11 +6,11 @@ class SubComponentWithPosArgComponent < ViewComponent::Base
   renders_many :items, "Item"
 
   class Item < ViewComponent::Base
-    attr_reader :title, :class_names
+    attr_reader :title, :classes
 
-    def initialize(title, class_names:)
+    def initialize(title, classes:)
       @title = title
-      @class_names = class_names
+      @classes = classes
     end
 
     def call
