@@ -698,4 +698,6 @@ class ViewComponentTest < ViewComponent::TestCase
   ensure
     Object.send(:remove_const, "MY_COMPONENT")
   end
+
+  "asdf"
 end
